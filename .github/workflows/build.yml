@@ -1,0 +1,103 @@
+name: Compilar Barri a Barri
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      # Python portable (glibc 2.17) perquè el binari funcioni a gairebé qualsevol distribució
+      - name: Entorn
+        run: |
+          uv python install 3.12
+          uv venv -p 3.12 .venv
+          uv pip install -p .venv/bin/python pygame-ce pyinstaller
+      - name: Compilar
+        run: |
+          .venv/bin/pyinstaller --noconfirm --clean --windowed --name barri-a-barri \
+            --add-data "data:data" --exclude-module tkinter --exclude-module numpy game.py
+          # millor fer servir les del sistema: les del runner demanen una glibc massa nova
+          rm -f dist/barri-a-barri/_internal/libstdc++.so.6 dist/barri-a-barri/_internal/libgcc_s.so.1
+          cp packaging/instalar.sh packaging/LLEGEIX-ME.txt dist/barri-a-barri/
+          chmod +x dist/barri-a-barri/instalar.sh
+          cd dist && mv barri-a-barri barri-a-barri-linux-x86_64
+          zip -qry ../barri-a-barri-linux-x86_64.zip barri-a-barri-linux-x86_64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: barri-a-barri-linux-x86_64
+          path: barri-a-barri-linux-x86_64.zip
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Entorn
+        run: pip install pygame-ce pyinstaller
+      - name: Compilar
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --clean --windowed --name "Barri a Barri" `
+            --icon data/icon.ico --add-data "data;data" `
+            --exclude-module tkinter --exclude-module numpy game.py
+          Copy-Item packaging/LLEGEIX-ME.txt "dist/Barri a Barri/"
+          Rename-Item "dist/Barri a Barri" "barri-a-barri-windows"
+          Compress-Archive -Path "dist/barri-a-barri-windows" -DestinationPath barri-a-barri-windows.zip
+      - name: Prova d'arrencada
+        shell: pwsh
+        run: |
+          $env:SDL_VIDEODRIVER = "dummy"; $env:SDL_AUDIODRIVER = "dummy"
+          $p = Start-Process "dist/barri-a-barri-windows/Barri a Barri.exe" -PassThru
+          Start-Sleep -Seconds 8
+          if ($p.HasExited) { Write-Error "El joc s'ha tancat sol (codi $($p.ExitCode))"; exit 1 }
+          Stop-Process -Id $p.Id
+      - uses: actions/upload-artifact@v4
+        with:
+          name: barri-a-barri-windows
+          path: barri-a-barri-windows.zip
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compilar (pygbag)
+        run: |
+          pip install pygbag
+          mkdir -p web/barri-a-barri
+          cp main.py game.py web/barri-a-barri/
+          cp -r data web/barri-a-barri/
+          python -m pygbag --build --archive --title "Barri a Barri" web/barri-a-barri
+          cp web/barri-a-barri/build/web.zip barri-a-barri-web.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: barri-a-barri-web
+          path: barri-a-barri-web.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, windows, web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            barri-a-barri-linux-x86_64.zip
+            barri-a-barri-windows.zip
+            barri-a-barri-web.zip

@@ -1,0 +1,39 @@
+BARRI A BARRI — El trencaclosques de Barcelona  (v0.1.0)
+=========================================================
+
+[CA] Encaixa els 73 barris de Barcelona al mapa, districte a districte,
+     i després prova-ho amb tota la ciutat. Al mode Dades, ordena els
+     barris de més gran a més petit.
+
+[ES] Encaja los 73 barrios de Barcelona en el mapa, distrito a distrito,
+     y luego atrévete con la ciudad entera. En el modo Dades, ordena los
+     barrios de mayor a menor superficie.
+
+[EN] Fit Barcelona's 73 neighbourhoods into the map, district by district,
+     then take on the whole city. In Dades mode, rank neighbourhoods by area.
+
+INSTAL·LAR / INSTALAR / INSTALL
+  ./instalar.sh                 només per a tu / solo para ti / just you
+  sudo ./instalar.sh            per a tots / para todos / system-wide (/opt)
+  ./instalar.sh --desinstalar   desinstal·lar / desinstalar / uninstall
+  Després surt al menú d'aplicacions / Luego aparece en el menú de aplicaciones.
+
+  Sense instal·lar / Sin instalar / Without installing:  ./barri-a-barri
+
+COM JUGAR / CÓMO JUGAR / HOW TO PLAY
+
+  Ratolí / Ratón / Mouse : arrossega els barris / arrastra / drag pieces
+  Roda / Rueda / Wheel   : desplaça la safata / desplaza / scroll the tray
+  H   pista / pista / hint        M   so / sonido / sound
+  F11 pantalla completa / fullscreen     Esc  enrere / atrás / back
+
+Requisits: Linux x86_64 (glibc 2.17 o superior, pràcticament qualsevol
+distribució dels últims 10 anys).
+
+El progrés es desa a ~/.local/share/barri-a-barri/progress.json
+
+CRÈDITS
+  Joc: Lluís Ridao — lluisridao.com
+  Dades cartogràfiques: Ajuntament de Barcelona / CartoBCN (CC BY 4.0)
+  Tipografia: DejaVu Sans (vegeu _internal/data/fonts/LICENSE-DejaVu.txt)
+  Fet amb Python i pygame-ce (LGPL).
