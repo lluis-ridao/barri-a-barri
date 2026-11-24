@@ -17,7 +17,8 @@
 
 ## Jugar
 
-Descarrega'l a itch.io o a la secció *Releases* (Linux, Windows i versió web).
+- **Al navegador, sense instal·lar res:** [lluis-ridao.github.io/barri-a-barri](https://lluis-ridao.github.io/barri-a-barri/)
+- **Descàrrega per a Linux i Windows:** [última versió](https://github.com/lluis-ridao/barri-a-barri/releases/latest)
 
 Linux: descomprimeix i executa `./instalar.sh` (o `sudo ./instalar.sh` per a tots els usuaris).
 
